@@ -9,52 +9,73 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query(sort: \Products.name, order: .forward, animation: .spring)
+    var products:[Products]
+    
+    @State private var showAlert = false
+    @State private var updatedProductName = ""
+    @State private var isUpdate: Bool = false
+    @State private var selectedProduct: Products?
     
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            List(products) { product in
+                Text(product.name)
+                    .swipeActions {
+                        Button("Delete", role: .destructive) {
+                            modelContext.delete(product)
+                        }
+                        
+                        Button("Update", role: .none) {
+                            isUpdate = true
+                            selectedProduct = product
+                            withAnimation {
+                                showAlert.toggle()
+                            }
+                        }
                     }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+            }.toolbar {
+                Button {
+                    isUpdate = false
+                    withAnimation {
+                        showAlert.toggle()
                     }
+                }label: {
+                    Image(systemName: "plus")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                    
                 }
             }
-            Text("Select an item")
+            .navigationTitle(Text("WWDC Bucket"))
+        }.alert(isUpdate ? "Update" : "Add", isPresented: $showAlert) {
+            TextField("Enter name", text: $updatedProductName)
+            
+            Button("Save") {
+                if !isUpdate {
+                    addProduct()
+                }else {
+                    updateProduct()
+                }
+            }
+            Button("Cancel", role: .cancel, action: {})
         }
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
+    
+    private func addProduct() {
+        let product = Products(name: updatedProductName)
+        modelContext.insert(product)
+        updatedProductName = ""
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
+    
+    private func updateProduct() {
+        selectedProduct?.name = updatedProductName
+        updatedProductName = ""
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

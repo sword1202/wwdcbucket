@@ -9,7 +9,7 @@
 * Have any doubt?, do raise an issue!
 
 ## Tips
-* Want tostore images, declare them as ```Data``` type and then compress you images to Data and then store
+* Want to store images, declare them as ```Data``` type and then compress the images to Data and then store
 
 ## App SnapShots
 | Create | Delete & Update | Fetch |

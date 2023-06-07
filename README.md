@@ -8,8 +8,8 @@
 * Do go through the project and learn the beasic of Swift Data
 * Have any doubt?, do raise an issue!
 
-## Tips
-* Want to store images, declare them as ```Data``` type and then compress the images to Data and then store
+## Tip
+* Want to store images, declare them as ```Data``` type and then compress it to Data and then store
 
 ## App SnapShots
 | Create | Delete & Update | Fetch |
